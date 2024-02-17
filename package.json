@@ -1,0 +1,14 @@
+{
+  "name": "udemy-js-45-day-bootcamp",
+  "version": "1.0.0",
+  "description": "example api",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Endang Ismaya",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
