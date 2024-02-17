@@ -39,6 +39,24 @@ app.get('/:id', (request, response) => {
   return response.json(user);
 });
 
+app.put('/:id', (request, response) => {
+  const targetUserId = +request.params.id;
+  let user = users.find((user) => user.id === targetUserId);
+
+  if (!user) {
+    return response.status(404).json({ message: 'User not found' });
+  }
+
+  // remove existing user
+  users = users.filter((user) => user.id !== targetUserId);
+
+  edited_user = request.body;
+  edited_user.id = targetUserId;
+  users.push(edited_user);
+
+  return response.status(200).json(edited_user);
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });
