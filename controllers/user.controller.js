@@ -1,12 +1,15 @@
+const { UserModel } = require('../database/db');
+
 let users = [];
 
-const getAllUser = (request, response) => {
+const getAllUser = async (request, response) => {
+  const users = await UserModel.findAll();
   return response.status(200).json(users);
 };
 
-const getUser = (request, response) => {
-  const targetUserId = +request.params.id;
-  let user = users.find((user) => user.id === targetUserId);
+const getUser = async (request, response) => {
+  const id = +request.params.id;
+  const user = await UserModel.findOne({ where: { id } });
 
   if (!user) {
     return response.status(404).json({ message: 'User not found' });
@@ -15,37 +18,36 @@ const getUser = (request, response) => {
   return response.json(user);
 };
 
-const createUser = (request, response) => {
-  const user = request.body;
-  user.id = Date.now();
-  users.push(user);
-  return response.status(201).json(user);
+const createUser = async (request, response) => {
+  const user = await UserModel.create(request.body);
+  return response.status(201).json(user.dataValues);
 };
 
-const deleteUser = (request, response) => {
-  targetUserId = +request.params.id;
-  users = users.filter((user) => user.id !== targetUserId);
-  return response
-    .status(204)
-    .json({ status: true, message: 'User has been deleted!' });
-};
-
-const updateUser = (request, response) => {
-  const targetUserId = +request.params.id;
-  let user = users.find((user) => user.id === targetUserId);
+const deleteUser = async (request, response) => {
+  const id = +request.params.id;
+  const user = await UserModel.findByPk(id);
 
   if (!user) {
     return response.status(404).json({ message: 'User not found' });
   }
 
-  // remove existing user
-  users = users.filter((user) => user.id !== targetUserId);
+  await user.destroy();
+  return response.status(404).json({ message: 'User has been deleted' });
+};
 
-  edited_user = request.body;
-  edited_user.id = targetUserId;
-  users.push(edited_user);
+const updateUser = async (request, response) => {
+  const id = +request.params.id;
+  const user = await UserModel.findByPk(id);
 
-  return response.status(200).json(edited_user);
+  if (!user) {
+    return response.status(404).json({ message: 'User not found' });
+  }
+
+  user.email = request.body.email;
+  user.password = request.body.password;
+  user.save();
+
+  return response.status(200).json(user);
 };
 
 module.exports = {
