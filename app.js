@@ -21,7 +21,7 @@ app.use('/login', loginRoute);
 app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ force: true });
+    // await sequelize.sync({ force: true });
     console.log(`Server running on PORT ${PORT}`);
   } catch (error) {
     console.error('error', error);

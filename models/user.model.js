@@ -21,6 +21,10 @@ const createUserModel = (sequelize) => {
       allowNull: false,
       defaultValue: false,
     },
+    picture_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   });
 };
 
