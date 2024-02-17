@@ -1,6 +1,5 @@
 const { UserModel } = require('../database/db');
-
-let users = [];
+const bcrypt = require('bcrypt');
 
 const getAllUser = async (request, response) => {
   const users = await UserModel.findAll();
@@ -19,8 +18,12 @@ const getUser = async (request, response) => {
 };
 
 const createUser = async (request, response) => {
-  const user = await UserModel.create(request.body);
-  return response.status(201).json(user.dataValues);
+  const userData = request.body;
+  userData.password = await bcrypt.hash(request.body.password, 12);
+  const user = await UserModel.create(userData);
+  const jsonData = user.toJSON();
+  delete jsonData.password;
+  return response.status(201).json(jsonData);
 };
 
 const deleteUser = async (request, response) => {

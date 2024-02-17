@@ -2,6 +2,7 @@
   "name": "udemy-js-45-day-bootcamp",
   "version": "1.0.0",
   "description": "example api",
+  "type": "commonjs",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js"
@@ -9,8 +10,10 @@
   "author": "Endang Ismaya",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.4",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.0"
