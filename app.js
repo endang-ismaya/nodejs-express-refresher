@@ -17,6 +17,7 @@ app.use(authentication);
 // routes
 app.use('/users', userRoute);
 app.use('/login', loginRoute);
+app.use('/public', express.static('public'));
 
 app.listen(PORT, async () => {
   try {

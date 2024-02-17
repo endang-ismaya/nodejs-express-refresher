@@ -53,10 +53,22 @@ const updateUser = async (request, response) => {
   return response.status(200).json(user);
 };
 
+const uploadPicture = async (req, res) => {
+  if (req.hasError) {
+    return res.status(400).json({ errors: req.errors });
+  }
+
+  const user = req.user;
+  user.picture_url = `public/users/${req.file.filename}`;
+  await user.save();
+  return res.status(200).json(user);
+};
+
 module.exports = {
   getAllUser,
   getUser,
   createUser,
   deleteUser,
   updateUser,
+  uploadPicture,
 };

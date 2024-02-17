@@ -4,9 +4,38 @@ const {
   createUser,
   deleteUser,
   updateUser,
+  uploadPicture,
 } = require('../controllers/user.controller');
 const authorization = require('../middlewares/authorization.middleware');
-
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/users');
+  },
+  filename: (req, file, cb) => {
+    const MIME_MAP = {
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+    };
+    // cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, `${Date.now()}_${req.user.id}.${MIME_MAP[file.mimetype]}`);
+  },
+});
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const mimeTypes = ['image/png', 'image/gif', 'image/jpeg', 'image/jpg'];
+    if (mimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      req.hasError = true;
+      req.errors = { picture: ['File type is not supported'] };
+      cb(null, false);
+    }
+  },
+});
 const router = require('express').Router();
 
 // route
@@ -15,5 +44,10 @@ router.post('/', createUser);
 router.delete('/:id', authorization, deleteUser);
 router.get('/:id', authorization, getUser);
 router.put('/:id', authorization, updateUser);
-
+router.post(
+  '/:id/picture',
+  authorization,
+  upload.single('picture'),
+  uploadPicture
+);
 module.exports = router;
