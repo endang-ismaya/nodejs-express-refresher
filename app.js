@@ -5,12 +5,14 @@ const { sequelize } = require('./database/db');
 const express = require('express');
 const userRoute = require('./routes/user.route');
 const loginRoute = require('./routes/login.route');
+const authentication = require('./middlewares/authentication.middleware');
 
 const app = express();
 const PORT = 3000;
 
 // json
 app.use(express.json());
+app.use(authentication);
 
 // routes
 app.use('/users', userRoute);

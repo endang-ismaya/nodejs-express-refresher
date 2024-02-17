@@ -5,14 +5,15 @@ const {
   deleteUser,
   updateUser,
 } = require('../controllers/user.controller');
+const authorization = require('../middlewares/authorization.middleware');
 
 const router = require('express').Router();
 
 // route
-router.get('/', getAllUser);
+router.get('/', authorization, getAllUser);
 router.post('/', createUser);
-router.delete('/:id', deleteUser);
-router.get('/:id', getUser);
-router.put('/:id', updateUser);
+router.delete('/:id', authorization, deleteUser);
+router.get('/:id', authorization, getUser);
+router.put('/:id', authorization, updateUser);
 
 module.exports = router;
