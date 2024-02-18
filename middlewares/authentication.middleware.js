@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { UserModel } = require('../database/db');
+const fs = require('fs');
+const path = require('path');
 
 const authentication = async (req, res, next) => {
   const token = req.headers?.authorization?.replace('Bearer ', '');
@@ -9,7 +11,8 @@ const authentication = async (req, res, next) => {
   }
 
   try {
-    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+    const privateKey = fs.readFileSync(path.join(__dirname, '../private.key'));
+    const { userId } = jwt.verify(token, privateKey, { algorithms: 'RS256' });
     const user = await UserModel.findByPk(userId);
     req.user = user;
   } catch (error) {

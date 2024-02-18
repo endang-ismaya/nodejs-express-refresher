@@ -146,3 +146,4 @@ dist
 # endang
 mynotes/
 .vscode/
+*.key

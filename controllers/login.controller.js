@@ -1,13 +1,20 @@
 const jwt = require('jsonwebtoken');
 const { UserModel } = require('../database/db');
 const bcrypt = require('bcrypt');
-const { loginValidation } = require('../validators/user.validators');
+const { loginValidator } = require('../validators/user.validators');
+const fs = require('fs');
+const path = require('path');
 
 const login = async (request, response) => {
   try {
-    const userData = await loginValidation.validate(request.body, {
+    console.log('login.controller::login');
+    console.log(request.body);
+
+    const userData = await loginValidator.validate(request.body, {
       abortEarly: false,
     });
+
+    console.log(userData);
 
     const { email, password } = userData;
 
@@ -27,13 +34,25 @@ const login = async (request, response) => {
         .json({ message: 'email or password incorrect' });
     }
 
+    const privateKey = fs.readFileSync(path.join(__dirname, '../private.key'));
+
     const payload = { userId: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(payload, privateKey, {
       expiresIn: '4h',
+      algorithm: 'RS256',
     });
     return response.send({ token });
   } catch (error) {
-    return response.status(400).json({ message: error.message });
+    if (error.name === 'ValidationError') {
+      // Handle validation errors specifically
+      return response
+        .status(400)
+        .json({ message: error.message, errors: error.errors });
+    } else {
+      // Handle other errors
+      console.error(error);
+      return response.status(500).json({ message: 'Internal server error' });
+    }
   }
 };
 
