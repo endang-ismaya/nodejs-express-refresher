@@ -1,7 +1,9 @@
 const isAdminOrSelf = async (req, res, next) => {
   const userIdRoute = +req.params.id;
   const userIdRequest = +req.user.id;
+
   if (req.user.is_admin || userIdRoute === userIdRequest) {
+    console.log('isAdminOrSelf.middleware::PASSED');
     return next();
   }
 

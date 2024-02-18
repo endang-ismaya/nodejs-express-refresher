@@ -1,5 +1,9 @@
 const { UserModel } = require('../database/db');
 const bcrypt = require('bcrypt');
+const {
+  createUserValidator,
+  updateUserValidator,
+} = require('../validators/user.validators');
 
 const getAllUser = async (request, response) => {
   const users = await UserModel.findAll();
@@ -21,12 +25,19 @@ const getUser = async (request, response) => {
 };
 
 const createUser = async (request, response) => {
-  const userData = request.body;
-  userData.password = await bcrypt.hash(request.body.password, 12);
-  const user = await UserModel.create(userData);
-  const jsonData = user.toJSON();
-  delete jsonData.password;
-  return response.status(201).json(jsonData);
+  try {
+    const userData = await createUserValidator.validate(request.body, {
+      abortEarly: false,
+    });
+
+    userData.password = await bcrypt.hash(request.body.password, 12);
+    const user = await UserModel.create(userData);
+    const jsonData = user.toJSON();
+    delete jsonData.password;
+    return response.status(201).json(jsonData);
+  } catch (error) {
+    return response.status(400).json({ message: error.message });
+  }
 };
 
 const deleteUser = async (request, response) => {
@@ -46,21 +57,34 @@ const deleteUser = async (request, response) => {
 };
 
 const updateUser = async (request, response) => {
-  const id = +request.params.id;
-  const user = await UserModel.findOne({
-    where: { id },
-    attributes: { exclude: ['password'] }, // Exclude the password field
-  });
+  try {
+    console.log('user.controller::updateUser');
 
-  if (!user) {
-    return response.status(404).json({ message: 'User not found' });
+    const id = +request.params.id;
+    const user = await UserModel.findOne({ where: { id } });
+
+    if (!user) {
+      return response.status(404).json({ message: 'User not found' });
+    }
+
+    const userData = await updateUserValidator.validate(request.body, {
+      abortEarly: false,
+      context: request.user.email,
+    });
+
+    console.log(userData);
+
+    user.email = userData.email;
+    user.password = await bcrypt.hash(userData.password, 12);
+    await user.save();
+
+    const jsonData = user.toJSON();
+    delete jsonData.password;
+
+    return response.status(200).json(jsonData);
+  } catch (error) {
+    return response.status(400).json({ message: error.message });
   }
-
-  user.email = request.body.email;
-  user.password = request.body.password;
-  user.save();
-
-  return response.status(200).json(user);
 };
 
 const uploadPicture = async (req, res) => {
