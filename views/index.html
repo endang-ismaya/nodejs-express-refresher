@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Web Socket Example</h1>
+    <pre id="message"></pre>
+    <input type="text" name="" id="">
+    <button>Send</button>
+    <script>
+      let socket = new WebSocket("ws://localhost:5129")
+      socket.onopen = function(e) {
+        console.log("Connection established")
+      }
+      socket.onmessage = function(e) {
+        console.log(e.data)
+        document.querySelector("#message").textContent = e.data
+      }
+      socket.onerror = function(e) {
+        console.error(e)
+      }
+      socket.onclose = function(e) {
+        console.log("Connection closed")
+      }
+      document.querySelector("button").addEventListener("click", function() {
+        let message = document.querySelector("input").value
+        socket.send(message)
+      })
+    </script>
+</body>
+</html>
+

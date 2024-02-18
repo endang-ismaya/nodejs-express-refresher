@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const { loginValidator } = require('../validators/user.validators');
 const fs = require('fs');
 const path = require('path');
+const sendMessage = require('../helpers/send-message.helper');
 
 const login = async (request, response) => {
   try {
@@ -41,6 +42,7 @@ const login = async (request, response) => {
       expiresIn: '4h',
       algorithm: 'RS256',
     });
+    sendMessage(request.wss, { type: 'login_success' });
     return response.send({ token });
   } catch (error) {
     if (error.name === 'ValidationError') {
