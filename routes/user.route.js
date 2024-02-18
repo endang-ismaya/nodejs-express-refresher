@@ -7,7 +7,9 @@ const {
   uploadPicture,
 } = require('../controllers/user.controller');
 const authorization = require('../middlewares/authorization.middleware');
+const isAdmin = require('../middlewares/is_admin.middleware');
 const multer = require('multer');
+const isAdminOrSelf = require('../middlewares/isadmin_or_self.middleware');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/users');
@@ -41,12 +43,13 @@ const router = require('express').Router();
 // route
 router.get('/', authorization, getAllUser);
 router.post('/', createUser);
-router.delete('/:id', authorization, deleteUser);
 router.get('/:id', authorization, getUser);
-router.put('/:id', authorization, updateUser);
+router.put('/:id', authorization, isAdminOrSelf, updateUser);
+router.delete('/:id', authorization, isAdmin, deleteUser);
 router.post(
   '/:id/picture',
   authorization,
+  isAdminOrSelf,
   upload.single('picture'),
   uploadPicture
 );

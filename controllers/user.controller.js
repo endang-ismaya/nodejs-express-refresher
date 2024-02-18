@@ -8,7 +8,10 @@ const getAllUser = async (request, response) => {
 
 const getUser = async (request, response) => {
   const id = +request.params.id;
-  const user = await UserModel.findOne({ where: { id } });
+  const user = await UserModel.findOne({
+    where: { id },
+    attributes: { exclude: ['password'] }, // Exclude the password field
+  });
 
   if (!user) {
     return response.status(404).json({ message: 'User not found' });
@@ -34,13 +37,20 @@ const deleteUser = async (request, response) => {
     return response.status(404).json({ message: 'User not found' });
   }
 
+  if (user.id == request.user.id) {
+    return response.status(403).json({ message: 'You cannot delete yourself' });
+  }
+
   await user.destroy();
   return response.status(404).json({ message: 'User has been deleted' });
 };
 
 const updateUser = async (request, response) => {
   const id = +request.params.id;
-  const user = await UserModel.findByPk(id);
+  const user = await UserModel.findOne({
+    where: { id },
+    attributes: { exclude: ['password'] }, // Exclude the password field
+  });
 
   if (!user) {
     return response.status(404).json({ message: 'User not found' });
